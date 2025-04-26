@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metrics-server
+  namespace: kube-system
+  labels:
+    k8s-app: metrics-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: metrics-server
+  template:
+    metadata:
+      labels:
+        k8s-app: metrics-server
+    spec:
+      containers:
+        - name: metrics-server
+          image: k8s.gcr.io/metrics-server/metrics-server:v0.6.1
+          command:
+            - "/metrics-server"
+            - "--cert-dir=/tmp"
+            - "--secure-port=10250"  # Use the default secure port for the kubelet API
+            - "--kubelet-insecure-tls"  # Allow insecure TLS connection with kubelet
+            - "--kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname"
+            - "--metric-resolution=15s"  # Metric scrape interval (optional)
+          volumeMounts:
+            - name: certs
+              mountPath: /tmp
+              readOnly: false
+      volumes:
+        - name: certs
+          emptyDir: {}
+      securityContext:
+        fsGroup: 2000

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  labels:
+    app: auth
+spec:
+  selector:
+    app: auth
+  ports:
+  - port: 5000
+    targetPort: 5000
+    nodePort: 30001  # Choose a port for external access
+  type: NodePort
